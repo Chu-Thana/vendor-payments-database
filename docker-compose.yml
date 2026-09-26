@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vendor-payments-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: vendor_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: vendor_payments
+
+    ports:
+      - "127.0.0.1:5434:5432"
+      -
+    volumes:
+      - vendor-postgres-data:/var/lib/postgresql/data
+      -
+    networks:
+      - default
+      - vendor-payments-shared
+      -
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vendor_user -d vendor_payments"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  vendor-postgres-data:
+
+networks:
+  vendor-payments-shared:
+    external: true
+
