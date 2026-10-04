@@ -16,7 +16,7 @@ BEGIN
         status
     )
     VALUES (
-        'batch_20260926_003',
+        'batch_20261004_grouped_validation_001',
         'FULL',
         'CREATED'
     )
@@ -76,7 +76,7 @@ BEGIN
 
 
     -- ========================================================
-    -- BUILD_GOLD - attempt 2 succeeds
+    -- 3. BUILD_GOLD - attempt 2 succeeds
     -- ========================================================
 
     SELECT recovery.start_stage_attempt(
@@ -127,12 +127,12 @@ BEGIN
 
 
     -- ========================================================
-    -- 6. LOAD_REDSHIFT
+    -- 6. REDSHIFT_CREATE_SCHEMAS
     -- ========================================================
 
     SELECT recovery.start_stage_attempt(
         v_run_id,
-        'LOAD_REDSHIFT'
+        'REDSHIFT_CREATE_SCHEMAS'
     )
     INTO v_stage_execution_id;
 
@@ -144,12 +144,97 @@ BEGIN
 
 
     -- ========================================================
-    -- 7. CROSS_LAYER_VALIDATION
+    -- 7. REDSHIFT_CREATE_BATCH_LANDING_TABLES
+    -- ========================================================
+
+    SELECT recovery.start_stage_attempt(
+        v_run_id,
+        'REDSHIFT_CREATE_BATCH_LANDING_TABLES'
+    )
+    INTO v_stage_execution_id;
+
+    PERFORM recovery.finish_stage_attempt(
+        v_stage_execution_id,
+        TRUE,
+        NULL
+    );
+
+
+    -- ========================================================
+    -- 8. REDSHIFT_COPY_BATCH_GOLD
+    -- ========================================================
+
+    SELECT recovery.start_stage_attempt(
+        v_run_id,
+        'REDSHIFT_COPY_BATCH_GOLD'
+    )
+    INTO v_stage_execution_id;
+
+    PERFORM recovery.finish_stage_attempt(
+        v_stage_execution_id,
+        TRUE,
+        NULL
+    );
+
+
+    -- ========================================================
+    -- 9. REDSHIFT_CREATE_ANALYTICS_VIEWS
+    -- ========================================================
+
+    SELECT recovery.start_stage_attempt(
+        v_run_id,
+        'REDSHIFT_CREATE_ANALYTICS_VIEWS'
+    )
+    INTO v_stage_execution_id;
+
+    PERFORM recovery.finish_stage_attempt(
+        v_stage_execution_id,
+        TRUE,
+        NULL
+    );
+
+
+    -- ========================================================
+    -- 10. REDSHIFT_VALIDATE_ANALYTICS
+    -- ========================================================
+
+    SELECT recovery.start_stage_attempt(
+        v_run_id,
+        'REDSHIFT_VALIDATE_ANALYTICS'
+    )
+    INTO v_stage_execution_id;
+
+    PERFORM recovery.finish_stage_attempt(
+        v_stage_execution_id,
+        TRUE,
+        NULL
+    );
+
+
+    -- ========================================================
+    -- 11. CROSS_LAYER_VALIDATION
     -- ========================================================
 
     SELECT recovery.start_stage_attempt(
         v_run_id,
         'CROSS_LAYER_VALIDATION'
+    )
+    INTO v_stage_execution_id;
+
+    PERFORM recovery.finish_stage_attempt(
+        v_stage_execution_id,
+        TRUE,
+        NULL
+    );
+
+
+    -- ========================================================
+    -- 12. GROUPED_CROSS_LAYER_VALIDATION
+    -- ========================================================
+
+    SELECT recovery.start_stage_attempt(
+        v_run_id,
+        'GROUPED_CROSS_LAYER_VALIDATION'
     )
     INTO v_stage_execution_id;
 

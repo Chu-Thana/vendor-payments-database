@@ -7,15 +7,20 @@ WITH pipeline_sequence AS (
             (3, 'BUILD_GOLD'),
             (4, 'CHECK_GOLD'),
             (5, 'UPLOAD_S3'),
-            (6, 'LOAD_REDSHIFT'),
-            (7, 'CROSS_LAYER_VALIDATION')
+            (6, 'REDSHIFT_CREATE_SCHEMAS'),
+            (7, 'REDSHIFT_CREATE_BATCH_LANDING_TABLES'),
+            (8, 'REDSHIFT_COPY_BATCH_GOLD'),
+            (9, 'REDSHIFT_CREATE_ANALYTICS_VIEWS'),
+            (10, 'REDSHIFT_VALIDATE_ANALYTICS'),
+            (11, 'CROSS_LAYER_VALIDATION'),
+            (12, 'GROUPED_CROSS_LAYER_VALIDATION')
     ) AS stages(stage_order, stage_name)
 ),
 
 target_run AS (
     SELECT pipeline_run_id
     FROM recovery.pipeline_runs
-    WHERE run_key = 'batch_20260925_001'
+    WHERE run_key = 'batch_20261004_grouped_validation_001'
 ),
 
 latest_attempts AS (

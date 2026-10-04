@@ -40,12 +40,8 @@ BEGIN
         UPDATE recovery.stage_executions
         SET
             status = 'SUCCEEDED',
-            finished_at = CASE
-                WHEN v_new_status IN ('SUCCEEDED', 'FAILED')
-                THEN clock_timestamp()
-                ELSE NULL
-            END
-                        error_message = NULL
+            finished_at = NOW(),
+            error_message = NULL
         WHERE stage_execution_id = p_stage_execution_id;
 
     ELSE
